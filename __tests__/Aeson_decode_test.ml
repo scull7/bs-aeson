@@ -37,7 +37,8 @@ module Test = struct
     | [] -> ();
     | first::rest ->
         test decoder prefix first;
-        throws decoder ~prefix rest 
+        throws decoder ~prefix rest
+
 end
 
 let () = 
