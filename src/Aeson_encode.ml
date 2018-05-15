@@ -7,6 +7,11 @@ external int : int -> Js.Json.t = "%identity"
 external boolean : bool -> Js.Json.t = "%identity" 
 external dict : Js.Json.t Js_dict.t -> Js.Json.t = "%identity"
 
+
+let int64 i: Js.Json.t =
+  i |> Int64.to_float
+    |> float
+
 let nullable encode = function
   | None -> null
   | Some v -> encode v
