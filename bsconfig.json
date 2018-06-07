@@ -1,6 +1,6 @@
 {
   "name": "bs-aeson",
-  "namespace": true,
+  "namespace": false,
   "suffix": ".bs.js",
   "bsc-flags": ["-bs-no-version-header", "-bs-super-errors"],
   "sources": [

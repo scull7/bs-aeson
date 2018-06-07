@@ -41,56 +41,60 @@ module Test = struct
 end
 
 let () = 
-let open BsAeson in
 
 describe "bool" (fun () ->
-  let open Aeson.Decode in
+  let open Aeson in
+  let open Decode in
 
   test "bool" (fun () ->
-    expect @@ bool (Aeson.Encode.bool true) |> toEqual true);
+    expect @@ bool (Encode.bool true) |> toEqual true);
 
   test "bool - false" (fun () ->
-    expect @@ bool (Aeson.Encode.bool false) |> toEqual false);
+    expect @@ bool (Encode.bool false) |> toEqual false);
   Test.throws bool [Float; Int; String; Null; Array; Object];
 );
 
 describe "float" (fun () ->
-  let open Aeson.Decode in
+  let open Aeson in
+  let open! Decode in
 
   test "float" (fun () ->
-    expect @@ float (Aeson.Encode.float 1.23) |> toEqual 1.23);
+    expect @@ float (Encode.float 1.23) |> toEqual 1.23);
   test "int" (fun () ->
-    expect @@ float (Aeson.Encode.int 23) |> toEqual 23.);
+    expect @@ float (Encode.int 23) |> toEqual 23.);
   
   Test.throws float [Bool; String; Null; Array; Object;];
 );
 
 describe "int" (fun () ->
-  let open Aeson.Decode in
+  let open Aeson in
+  let open! Decode in
 
   test "int" (fun () ->
-    expect @@ int (Aeson.Encode.int 23) |> toEqual 23);
+    expect @@ int (Encode.int 23) |> toEqual 23);
 
   test "int > 32-bit" (fun () ->
     (* Use %raw since integer literals > Int32.max_int overflow without warning *)
     let big_int = [%raw "2147483648"] in
-      expect @@ int (Aeson.Encode.int big_int) |> toEqual big_int);
+      expect @@ int (Encode.int big_int) |> toEqual big_int);
   
   Test.throws int [Bool; Float; String; Null; Array; Object];
 );
 
 describe "int32" (fun () ->
-  let open Aeson.Decode in
+  let open Aeson in
+  let open! Decode in
 
   test "int32" (fun () ->
-    expect @@ int32 (Aeson.Encode.int32 (Int32.of_int 23)) |> toEqual (Int32.of_int 23));
+    expect @@ int32 (Encode.int32 (Int32.of_int 23)) |> toEqual (Int32.of_int 23));
 
   test "int32" (fun () ->
-    expect @@ int32 (Aeson.Encode.int32 (Int32.of_int (-23223))) |> toEqual (Int32.of_int (-23223)));
+    expect @@ int32 (Encode.int32 (Int32.of_int (-23223))) |> toEqual (Int32.of_int (-23223)));
 );
 
 describe "int64" (fun () ->
-  let open Aeson.Decode in
+  let open Aeson in
+  let open! Decode in
 
   test "int64" (fun () ->
     expect @@ int64 (Aeson.Encode.string "23") |> toEqual (Int64.of_int 23));
@@ -103,89 +107,95 @@ describe "int64" (fun () ->
 );
 
 describe "int64_of_array" (fun () ->
-  let open Aeson.Decode in
+  let open Aeson in
+  let open! Decode in
 
   test "int64_of_array" (fun () ->
-    expect @@ int64_of_array (Aeson.Encode.int64_to_array (Int64.of_int 23)) |> toEqual (Int64.of_int 23));
+    expect @@ int64_of_array (Encode.int64_to_array (Int64.of_int 23)) |> toEqual (Int64.of_int 23));
 
   test "int64_of_array" (fun () ->
-    expect @@ int64_of_array (Aeson.Encode.int64_to_array (Int64.of_string "9223372036854775807")) |> toEqual (Int64.of_string "9223372036854775807"));
+    expect @@ int64_of_array (Encode.int64_to_array (Int64.of_string "9223372036854775807")) |> toEqual (Int64.of_string "9223372036854775807"));
 
   test "int64_of_array" (fun () ->
-    expect @@ int64_of_array (Aeson.Encode.int64_to_array (Int64.of_string "-9223372036854775807")) |> toEqual (Int64.of_string "-9223372036854775807"));
+    expect @@ int64_of_array (Encode.int64_to_array (Int64.of_string "-9223372036854775807")) |> toEqual (Int64.of_string "-9223372036854775807"));
 );
 
 describe "nativeint" (fun () ->
-  let open Aeson.Decode in
+  let open Aeson in
+  let open! Decode in
 
   test "nativeint" (fun () ->
-    expect @@ nativeint (Aeson.Encode.nativeint (Nativeint.of_int 23)) |> toEqual (Nativeint.of_int 23));
+    expect @@ nativeint (Encode.nativeint (Nativeint.of_int 23)) |> toEqual (Nativeint.of_int 23));
 
   test "nativeint" (fun () ->
-    expect @@ nativeint (Aeson.Encode.nativeint (Nativeint.of_int (-23223))) |> toEqual (Nativeint.of_int (-23223)));
+    expect @@ nativeint (Encode.nativeint (Nativeint.of_int (-23223))) |> toEqual (Nativeint.of_int (-23223)));
 );
 
 describe "string" (fun () ->
-  let open Aeson.Decode in
+  let open Aeson in
+  let open! Decode in
 
   test "string" (fun () ->
-    expect @@ string (Aeson.Encode.string "test") |> toEqual "test");
+    expect @@ string (Encode.string "test") |> toEqual "test");
 
   Test.throws string [Bool; Float; Int; Null; Array; Object];
 );
 
 describe "date" (fun () ->
-  let open Aeson.Decode in
-
+  let open Aeson in
+  let open! Decode in
   let nowString = "2017-12-08T06:03:22Z" in
   let now = Js_date.fromString nowString in
 
   test "date" (fun () ->
-    expect @@ date (Aeson.Encode.date now) |> toEqual now )
+    expect @@ date (Encode.date now) |> toEqual now )
 );
 
 describe "nullable" (fun () ->
-  let open Aeson.Decode in
+  let open Aeson in
+  let open! Decode in
 
   test "int -> int" (fun () ->
-    expect @@ (nullable int) (Aeson.Encode.int 23) |> toEqual (Js.Null.return 23));
+    expect @@ (nullable int) (Encode.int 23) |> toEqual (Js.Null.return 23));
   test "null -> int" (fun () ->
-    expect @@ (nullable int) Aeson.Encode.null |> toEqual Js.null);
+    expect @@ (nullable int) Encode.null |> toEqual Js.null);
 
   test "bool -> bool" (fun () ->
-    expect @@ nullable bool (Aeson.Encode.bool true) |> toEqual (Js.Null.return true));
+    expect @@ nullable bool (Encode.bool true) |> toEqual (Js.Null.return true));
   test "float -> float" (fun () ->
-    expect @@ nullable float (Aeson.Encode.float 1.23) |> toEqual (Js.Null.return 1.23));
+    expect @@ nullable float (Encode.float 1.23) |> toEqual (Js.Null.return 1.23));
   test "string -> string" (fun () ->
-    expect @@ nullable string (Aeson.Encode.string "test") |> toEqual (Js.Null.return "test"));
+    expect @@ nullable string (Encode.string "test") |> toEqual (Js.Null.return "test"));
   test "null -> null" (fun () ->
-    expect @@ nullable (nullAs Js.null) Aeson.Encode.null |> toEqual Js.null);
+    expect @@ nullable (nullAs Js.null) Encode.null |> toEqual Js.null);
 
   Test.throws (nullable int) [Bool; Float; String; Array; Object];
   Test.throws (nullable bool) [Int];
 );
 
 describe "nullAs" (fun () ->
-  let open Aeson.Decode in
+  let open Aeson in
+  let open Decode in
 
   test "as 0 - null" (fun () ->
-    expect @@ (nullAs 0) Aeson.Encode.null |> toEqual 0);
+    expect @@ (nullAs 0) Encode.null |> toEqual 0);
 
   test "as Js.null" (fun () ->
-    expect (nullAs Js.null Aeson.Encode.null) |> toEqual Js.null);
+    expect (nullAs Js.null Encode.null) |> toEqual Js.null);
   test "as None" (fun () ->
-    expect (nullAs None Aeson.Encode.null) |> toEqual None);
+    expect (nullAs None Encode.null) |> toEqual None);
   test "as Some _" (fun () ->
-    expect (nullAs (Some "foo") Aeson.Encode.null) |> toEqual (Some "foo"));
+    expect (nullAs (Some "foo") Encode.null) |> toEqual (Some "foo"));
 
   Test.throws (nullAs 0) [Bool; Float; Int; String; Array; Object];
 );
 
 describe "array" (fun () ->
-  let open Aeson.Decode in
+  let open Aeson in
+  let open! Decode in
 
   test "array" (fun () ->
-    expect @@ (array int) (Aeson.Encode.array [||]) |> toEqual [||]);
+    expect @@ (array int) (Encode.array [||]) |> toEqual [||]);
 
   test "array bool" (fun () ->
     expect @@
@@ -216,10 +226,11 @@ describe "array" (fun () ->
 );
 
 describe "list" (fun () ->
-  let open Aeson.Decode in
+  let open Aeson in
+  let open! Decode in
 
   test "array" (fun () ->
-    expect @@ (list int) (Aeson.Encode.array [||]) |> toEqual []);
+    expect @@ (list int) (Encode.array [||]) |> toEqual []);
 
   test "list bool" (fun () ->
     expect @@
@@ -250,7 +261,8 @@ describe "list" (fun () ->
 );
 
 describe "pair" (fun () ->
-  let open Aeson.Decode in
+  let open Aeson in
+  let open! Decode in
 
   test "pair string int" (fun () ->
     expect @@ pair string int (Js.Json.parseExn {| ["a", 3] |})
@@ -273,20 +285,22 @@ describe "pair" (fun () ->
 );
 
 describe "singleEnumerator" (fun () ->
-  let open Aeson.Decode in
+  let open Aeson in
+  let open! Decode in
 
   test "singleEnumerator" (fun () ->
     expect @@
-      singleEnumerator Test.SingleEnumerator (Aeson.Encode.array [||])
+      singleEnumerator Test.SingleEnumerator (Encode.array [||])
       |> toEqual Test.SingleEnumerator);
 );
 
 describe "dict" (fun () ->
-  let open Aeson.Decode in
+  let open Aeson in
+  let open! Decode in
 
   test "object" (fun () ->
     expect @@
-      dict int (Aeson.Encode.object_ [])
+      dict int (Encode.object_ [])
       |> toEqual (Js.Dict.empty ()));
 
   test "dict bool" (fun () ->
@@ -318,7 +332,8 @@ describe "dict" (fun () ->
 );
 
 describe "field" (fun () ->
-  let open Aeson.Decode in
+  let open Aeson in
+  let open! Decode in
 
   test "field bool" (fun () ->
     expect @@
@@ -349,7 +364,8 @@ describe "field" (fun () ->
 );
 
 describe "at" (fun () ->
-  let open Aeson.Decode in
+  let open Aeson in
+  let open! Decode in
 
   test "at bool" (fun () ->
     expect @@
@@ -370,37 +386,38 @@ describe "at" (fun () ->
 );
 
 describe "optional" (fun () ->
-  let open Aeson.Decode in
+  let open Aeson in
+  let open! Decode in
 
   test "bool -> int" (fun () ->
-    expect @@ (optional int) (Aeson.Encode.bool true) |> toEqual None);
+    expect @@ (optional int) (Encode.bool true) |> toEqual None);
   test "float -> int" (fun () ->
-    expect @@ (optional int) (Aeson.Encode.float 1.23) |> toEqual None);
+    expect @@ (optional int) (Encode.float 1.23) |> toEqual None);
   test "int -> int" (fun () ->
-    expect @@ (optional int) (Aeson.Encode.int 23) |> toEqual (Some 23));
+    expect @@ (optional int) (Encode.int 23) |> toEqual (Some 23));
   test "int32 -> int32" (fun () ->
-    expect @@ (optional int32) (Aeson.Encode.int32 (Int32.of_int 23)) |> toEqual (Some (Int32.of_int 23)));
+    expect @@ (optional int32) (Encode.int32 (Int32.of_int 23)) |> toEqual (Some (Int32.of_int 23)));
   test "int64 -> int64" (fun () ->
-    expect @@ (optional int64_of_array) (Aeson.Encode.int64_to_array (Int64.of_int 64)) |> toEqual (Some (Int64.of_int 64)));
+    expect @@ (optional int64_of_array) (Encode.int64_to_array (Int64.of_int 64)) |> toEqual (Some (Int64.of_int 64)));
   test "string -> int" (fun () ->
-    expect @@ (optional int) (Aeson.Encode.string "test") |> toEqual None);
+    expect @@ (optional int) (Encode.string "test") |> toEqual None);
   test "null -> int" (fun () ->
-    expect @@ (optional int) Aeson.Encode.null |> toEqual None);
+    expect @@ (optional int) Encode.null |> toEqual None);
   test "array -> int" (fun () ->
-    expect @@ (optional int) (Aeson.Encode.array [||]) |> toEqual None);
+    expect @@ (optional int) (Encode.array [||]) |> toEqual None);
   test "object -> int" (fun () ->
-    expect @@ (optional int) (Aeson.Encode.object_ []) |> toEqual None);
+    expect @@ (optional int) (Encode.object_ []) |> toEqual None);
 
   test "bool -> bool " (fun () ->
-    expect @@ optional bool (Aeson.Encode.bool true) |> toEqual (Some true));
+    expect @@ optional bool (Encode.bool true) |> toEqual (Some true));
   test "float -> float" (fun () ->
-    expect @@ optional float (Aeson.Encode.float 1.23) |> toEqual (Some 1.23));
+    expect @@ optional float (Encode.float 1.23) |> toEqual (Some 1.23));
   test "string -> string" (fun () ->
-    expect @@ optional string (Aeson.Encode.string "test") |> toEqual (Some "test"));
+    expect @@ optional string (Encode.string "test") |> toEqual (Some "test"));
   test "null -> null" (fun () ->
-    expect @@ optional (nullAs Js.null) Aeson.Encode.null |> toEqual (Some Js.null));
+    expect @@ optional (nullAs Js.null) Encode.null |> toEqual (Some Js.null));
   test "int -> bool" (fun () ->
-    expect @@ (optional bool) (Aeson.Encode.int 1) |> toEqual None);
+    expect @@ (optional bool) (Encode.int 1) |> toEqual None);
 
   test "optional field" (fun () ->
     expect @@
@@ -429,18 +446,20 @@ describe "optional" (fun () ->
 );
 
 describe "oneOf" (fun () ->
-  let open Aeson.Decode in
+  let open Aeson in
+  let open! Decode in
 
   test "object with field" (fun () ->
     expect @@ (oneOf [int; field "x" int]) (Js.Json.parseExn {| { "x": 2} |}) |> toEqual 2);
   test "int" (fun () ->
-    expect @@ (oneOf [int; field "x" int]) (Aeson.Encode.int 23) |> toEqual 23);
+    expect @@ (oneOf [int; field "x" int]) (Encode.int 23) |> toEqual 23);
 
   Test.throws (oneOf [int; field "x" int]) [Bool; Float; String; Null; Array; Object];
 );
 
 describe "result" (fun () ->
-  let open Aeson.Decode in
+  let open Aeson in
+  let open! Decode in
 
   test "Ok" (fun () ->
     expect @@ (result int string) (Js.Json.parseExn {| {"Error": "hello"} |}) |> toEqual (Belt.Result.Error "hello"));
@@ -450,72 +469,78 @@ describe "result" (fun () ->
 );
   
 describe "either" (fun () ->
-  let open Aeson.Decode in
+  let open Aeson in
+  let open! Decode in
 
   test "Right" (fun () ->
-    expect @@ (either int string) (Js.Json.parseExn {| {"Right": "hello"} |}) |> toEqual (Aeson.Compatibility.Either.Right "hello"));
+    expect @@ (either int string) (Js.Json.parseExn {| {"Right": "hello"} |}) |> toEqual (Compatibility.Either.Right "hello"));
   
   test "Left" (fun () ->
-    expect @@ (either int string) (Js.Json.parseExn {| {"Left": 2} |}) |> toEqual (Aeson.Compatibility.Either.Left 2));
+    expect @@ (either int string) (Js.Json.parseExn {| {"Left": 2} |}) |> toEqual (Compatibility.Either.Left 2));
 );
   
 describe "tryEither" (fun () ->
-  let open Aeson.Decode in
+  let open Aeson in
+  let open! Decode in
 
   test "object with field" (fun () ->
     expect @@ (tryEither int (field "x" int)) (Js.Json.parseExn {| { "x": 2} |}) |> toEqual 2);
   test "int" (fun () ->
-    expect @@ (tryEither int (field "x" int)) (Aeson.Encode.int 23) |> toEqual 23);
+    expect @@ (tryEither int (field "x" int)) (Encode.int 23) |> toEqual 23);
 
   Test.throws (tryEither int (field "x" int)) [Bool; Float; String; Null; Array; Object];
 );
 
 describe "withDefault" (fun () ->
-  let open Aeson.Decode in
+  let open Aeson in
+  let open! Decode in
 
   test "bool" (fun () ->
-    expect @@ (withDefault 0 int) (Aeson.Encode.bool true) |> toEqual 0);
+    expect @@ (withDefault 0 int) (Encode.bool true) |> toEqual 0);
   test "float" (fun () ->
-    expect @@ (withDefault 0 int) (Aeson.Encode.float 1.23) |> toEqual 0);
+    expect @@ (withDefault 0 int) (Encode.float 1.23) |> toEqual 0);
   test "int" (fun () ->
-    expect @@ (withDefault 0 int) (Aeson.Encode.int 23) |> toEqual 23);
+    expect @@ (withDefault 0 int) (Encode.int 23) |> toEqual 23);
   test "string" (fun () ->
-    expect @@ (withDefault 0 int) (Aeson.Encode.string "test") |> toEqual 0);
+    expect @@ (withDefault 0 int) (Encode.string "test") |> toEqual 0);
   test "null" (fun () ->
-    expect @@ (withDefault 0 int) Aeson.Encode.null |> toEqual 0);
+    expect @@ (withDefault 0 int) Encode.null |> toEqual 0);
   test "array" (fun () ->
-    expect @@ (withDefault 0 int) (Aeson.Encode.array [||]) |> toEqual 0);
+    expect @@ (withDefault 0 int) (Encode.array [||]) |> toEqual 0);
   test "object" (fun () ->
-    expect @@ (withDefault 0 int) (Aeson.Encode.object_ []) |> toEqual 0);
+    expect @@ (withDefault 0 int) (Encode.object_ []) |> toEqual 0);
 );
 
 describe "map" (fun () ->
-  let open Aeson.Decode in
+  let open Aeson in
+  let open! Decode in
 
   test "int" (fun () ->
-    expect @@ (int |> map ((+)2)) (Aeson.Encode.int 23) |> toEqual 25);
+    expect @@ (int |> map ((+)2)) (Encode.int 23) |> toEqual 25);
 
   Test.throws (int |> map ((+)2)) [Bool; Float; String; Null; Array; Object];
 );
 
 describe "andThen" (fun () ->
-  let open Aeson.Decode in
+  let open Aeson in
+  let open! Decode in
 
   test "int -> int" (fun () ->
-    expect @@ (int |> andThen (fun _ -> int)) (Aeson.Encode.int 23) |> toEqual 23);
+    expect @@ (int |> andThen (fun _ -> int)) (Encode.int 23) |> toEqual 23);
 
   test "int -> int andThen float" (fun () ->
-    expect @@ (int |> andThen (fun _ -> Aeson.Decode.float)) (Aeson.Encode.int 23) |> toEqual 23.);
+    expect @@ (int |> andThen (fun _ -> float)) (Encode.int 23) |> toEqual 23.);
   test "int -> float andThen int" (fun () ->
-    expect @@ (Aeson.Decode.float |> andThen (fun _ -> int)) (Aeson.Encode.int 23) |> toEqual 23);
+    expect @@ (float |> andThen (fun _ -> int)) (Encode.int 23) |> toEqual 23);
 
   Test.throws ~prefix:"int andThen int " (int |> andThen (fun _ -> int)) [Bool; Float; String; Null; Array; Object];
-  Test.throws ~prefix:"float andThen int " (Aeson.Decode.float |> andThen (fun _ -> int)) [Float];
-  Test.throws ~prefix:"int to " (int |> andThen (fun _ -> Aeson.Decode.float)) [Float];
+  Test.throws ~prefix:"float andThen int " (float |> andThen (fun _ -> int)) [Float];
+  Test.throws ~prefix:"int to " (int |> andThen (fun _ -> float)) [Float];
 );
 
 describe "composite expressions" (fun () ->
-  let open Aeson.Decode in
+  let open Aeson in
+  let open! Decode in
   
   test "dict array array int" (fun () ->
     expect @@
