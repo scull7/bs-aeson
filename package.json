@@ -1,5 +1,5 @@
 {
-  "name": "bs-aeson",
+  "name": "@buckeye/bs-aeson",
   "version": "3.0.0",
   "description": "BuckleScript JSON serializations that match Haskell aeson",
   "main": "index.js",
